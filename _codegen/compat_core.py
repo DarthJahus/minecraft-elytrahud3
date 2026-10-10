@@ -139,6 +139,21 @@ _COMPASS_3D = (
     "        pose.translate((float) -centerX, (float) -centerY, 0.0f);"
 )
 
+_BALL_2D = (
+    "        graphics.pose().pushMatrix();\n"
+    "        graphics.pose().translate((float) centerX, (float) centerY);\n"
+    "        graphics.pose().rotate((float) Math.toRadians(ballAngle));\n"
+    "        graphics.pose().translate((float) -centerX, (float) -centerY);"
+)
+
+_BALL_3D = (
+    "        PoseStack ballPose = graphics.pose();\n"
+    "        ballPose.pushPose();\n"
+    "        ballPose.translate((float) centerX, (float) centerY, 0.0f);\n"
+    "        ballPose.mulPose(Axis.ZP.rotation((float) Math.toRadians(ballAngle)));\n"
+    "        ballPose.translate((float) -centerX, (float) -centerY, 0.0f);"
+)
+
 _HELPER_2D = (
     "        graphics.pose().pushMatrix();\n"
     "        graphics.pose().translate((float) centerX, (float) centerY);\n"
@@ -207,6 +222,8 @@ def emit_hud_renderer(cog, loader, ver, codegen):
                 _POSE3D_IMPORTS + "import net.minecraft.client.Minecraft;", count=1)
         t = sub(t, _COMPASS_2D, _COMPASS_3D, count=1)
         t = sub(t, "        matrices.popMatrix();", "        pose.popPose();", count=1)
+        t = sub(t, _BALL_2D, _BALL_3D, count=1)
+        t = sub(t, "        graphics.pose().popMatrix();", "        ballPose.popPose();", count=1)
     emit(cog, t)
 
 

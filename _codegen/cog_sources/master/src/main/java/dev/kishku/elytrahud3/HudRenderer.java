@@ -166,8 +166,20 @@ public class HudRenderer {
         int yPos = scaledHeight - (50 + defaultY);
 
         int horizonY = 41 + pitchOffset;
+
+        // Rotate the entire ball (blue/brown + pitch ladder) so it stays aligned with the world horizon.
+        // The white aircraft symbol (-o-) stays fixed as part of the instrument frame.
+        float ballAngle = angleRoll;
+
+        graphics.pose().pushMatrix();
+        graphics.pose().translate((float) centerX, (float) centerY);
+        graphics.pose().rotate((float) Math.toRadians(ballAngle));
+        graphics.pose().translate((float) -centerX, (float) -centerY);
+
+        // Blue/brown ball background
         graphics.blit(RenderPipelines.GUI_TEXTURED, WIDGETS_TEXTURE, centerX - 25, yPos, 100f, 100f, 50, 50, 256, 256, -1);
 
+        // Pitch ladder lines (must rotate with the ball)
         int[][] horizonList = {
             {1, 10, 20}, {1, 16, 17}, {1, 22, 14}, {1, 24, 13}, {1, 26, 12},
             {1, 30, 10}, {1, 32, 9}, {2, 34, 8}, {1, 36, 7}, {1, 38, 6},
@@ -185,7 +197,10 @@ public class HudRenderer {
             horizonX += row[0];
         }
 
-        HudRenderHelper.renderHorizon(graphics, centerX, centerY, angleRoll);
+        graphics.pose().popMatrix();
+
+        // White aircraft symbol (-o-) stays fixed (part of the frame)
+        HudRenderHelper.renderHorizon(graphics, centerX, centerY, 0.0f);
 
         if (config.renderTitles) {
             graphics.blit(RenderPipelines.GUI_TEXTURED, WIDGETS_TEXTURE, centerX - 15, yPos - 10, 215f, 179f, 29, 9, 256, 256, -1);
